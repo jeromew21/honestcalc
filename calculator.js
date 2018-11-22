@@ -156,3 +156,111 @@ var twos_to_decimal = function(binary, bits) {
         return "-" + "" + added1;
     }
 }
+
+class ConversionComponent {
+    constructor(list_of_types, funcs, title) {
+        this.types = list_of_types;
+        this.idPrefix = Math.random().toString(36).substring(2);
+        this.funcs = funcs;
+        this.title = "<h3>" + title + "</h3>\n<p>" + this.types.join(" &#8596; ") + "</p>";
+    }
+
+    mount() {
+        var self = this;
+        var html = '<div class="calc">' + this.title;
+        for (var i in this.types) {
+            var elemId = this.idPrefix + i;
+            html += '<div><input type="text" class="' + this.idPrefix + '" id="' + elemId + '"> ' + this.types[i] + "</div>";
+            (function() {
+                var k = i;
+                $("#content").on("input", "#" + elemId, function() {
+                    var myValue = this.value;
+                    var funcs = self.funcs[k];
+                    var fi = 0;
+                    var inputElems = $("." + self.idPrefix);
+                    for (var m = 0; m < inputElems.length; m++) {
+                        if (inputElems[m].id != self.idPrefix + k) {
+                            var convertedValue = funcs[fi](myValue);
+                            $("body").find("#" + inputElems[m].id).val(convertedValue);
+                            fi += 1;
+                        }
+                    }
+                });
+            })(); //must call to preserve frame
+        }
+        html += "</div>"
+        $("#content").append(html);
+    }
+}
+
+var temp = new ConversionComponent(["Celsius (°C)", "Fahrenheit (°F)", "Kelvin (K)"], [
+    [function(c) {
+        if (isNaN(parseFloat(c))) { return ""; }
+        return (parseFloat(c) * (9/5)) + 32;
+    }, function(c) { 
+        if (isNaN(parseFloat(c))) { return ""; } 
+        var k = parseFloat(c) + 273; 
+        if (k < 0) {
+            return 0;
+        }
+        return k;
+    }],
+    [function(f) {
+        if (isNaN(parseFloat(f))) { return ""; }
+        return (parseFloat(f) - 32) * (5/9);
+    }, function(f) {
+        if (isNaN(parseFloat(f))) { return ""; }
+        var k = ((parseFloat(f) - 32) * (5/9)) + 273; 
+        if (k < 0) {
+            return 0;
+        }
+        return k;
+    }],
+    [function(kelvin) { 
+        if (isNaN(parseFloat(kelvin))) { return ""; }
+        return parseFloat(kelvin) - 273;
+    }, function(kelvin) { 
+        if (isNaN(parseFloat(kelvin))) { return ""; }
+        return ((parseFloat(kelvin) - 273) * (9/5)) + 32;
+    }],
+], "Temperature");
+
+var usign = new ConversionComponent(["Hexadecimal", "Binary (unsigned)", "Decimal"], [
+    [hex_to_binary, function(hex) { return binary_to_decimal(hex_to_binary(hex)); }],
+    [binary_to_hex, binary_to_decimal],
+    [function(decimal) { return binary_to_hex(decimal_to_binary_unsigned(decimal)); }, decimal_to_binary_unsigned],
+], "Unsigned Integer Representation");
+
+var twos = new ConversionComponent(["Hexadecimal", "Binary (Two's Complement)", "Decimal"], [
+    [function(hex) {
+        if (hex == "") {
+            return ""
+        }
+        var binary_rep = hex_to_binary(hex);
+        if (binary_rep == "") {
+            return ""
+        }
+        if (binary_rep.length > 8) {
+            binary_rep = least_sig(binary_rep, 8);
+        } else {
+            binary_rep = "0".repeat(8 - binary_rep.length) + binary_rep;
+        }
+        return binary_rep; 
+    }, function(hex) {
+        if (hex == "") {
+            return ""
+        }
+        var binary_rep = hex_to_binary(hex);
+        if (binary_rep == "") {
+            return ""
+        }
+        if (binary_rep.length > 8) {
+            binary_rep = least_sig(binary_rep, 8);
+        } else {
+            binary_rep = "0".repeat(8 - binary_rep.length) + binary_rep;
+        }
+        return twos_to_decimal(binary_rep, 8); 
+    }],
+    [binary_to_hex, function(binary) { return twos_to_decimal(binary, 8); }],
+    [function(decimal) { return binary_to_hex(decimal_to_twos(decimal, 8)); }, function(decimal) { return decimal_to_twos(decimal, 8) }],
+], "8-bit Two's Complement Integer Representation");

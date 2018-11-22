@@ -1,12 +1,13 @@
 ---
 layout: default
 title: About
+description: "Honest Calc is a good-looking, intuitive tool to help with your homework and aid in your understanding of mathematical concepts"
 permalink: /about/
 ---
 
 ## About Honest Calc
 
-Finally, a good looking, intuitive calculator to help with your homework and aid in your understanding of these concepts.
+Finally, a good looking, intuitive calculator to help with your homework and aid in your understanding of mathematical and computer science concepts.
 
 ### FAQ
 
