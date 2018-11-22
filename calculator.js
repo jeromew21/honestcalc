@@ -395,6 +395,49 @@ class FunctionComponent {
     }
 }
 
+class FunctionComponentOptions {
+    constructor(labels, func, title) {
+        this.labels = labels;
+        this.func = func;
+        this.title = "<h3>" + title + "</h3>";
+        this.idPrefix = Math.random().toString(36).substring(2);
+    }
+
+    mount() {
+        var self = this;
+        var html = '<div class="calc">' + this.title;
+        for (var i in this.labels) {
+            var elemId = this.idPrefix + i;
+            html += '<div><input type="text" class="' + this.idPrefix + 'text ' + this.idPrefix + '" id="' + elemId + '"> ' + this.labels[i][0] + " ";
+            html += "<select class='" + this.idPrefix + " " + this.idPrefix + "sel'>";
+            for (var q in this.labels[i][1]) {
+                html += "<option value='" + this.labels[i][1][q] + "'>";
+                html += this.labels[i][1][q]
+                html += "</option>";
+            }
+            html +="</select>";
+            html += "</div>";
+            (function() {
+                var k = i;
+                $("#content").on("input", "." + self.idPrefix, function() {
+                    var args = [];
+                    var inputElems = $("." + self.idPrefix + 'text');
+                    var inputElems2 = $("." + self.idPrefix + "sel");
+                    console.log(inputElems)
+                    for (var m = 0; m < inputElems.length; m++) {
+                        args.push([inputElems[m].value, inputElems2[m].value])
+                    }
+                    var res = self.func(args);
+                    $("body").find("#" + self.idPrefix + 'result').html(res)
+                });
+            })(); //must call to preserve frame
+        }
+        html += "<div id='" + this.idPrefix + "result'></div>"
+        html += "</div>"
+        $("#content").append(html);
+    }
+}
+
 var finalGrade = new FunctionComponent([
     "Current grade (%)?",
     "Final is worth how many percent (%)?",
@@ -430,6 +473,20 @@ var finalGrade = new FunctionComponent([
     return result;
 }, "What grade do I need to get on the final?")
 
+var bmi = new FunctionComponentOptions([
+    ["Weight", ["lb", "kg"]],
+    ["Height", ["ft'in", "inches", "cm", "m"]],
+], function(args) {
+    console.log(args)
+    var w = args[0];
+    var h = args[1];
+    var index = (w / (h*h));
+    if (isNaN(parseFloat(index))) {
+        return "Please enter valid numbers"
+    }
+    return "BMI: " + index;
+}, "BMI Calculator")
+
 var temp = new ConversionComponentV2(["Celsius (°C)", "Kelvin (K)", "Fahrenheit (°F)"], [
     function(i) {
         if (isNaN(parseFloat(i))) {
@@ -443,6 +500,9 @@ var temp = new ConversionComponentV2(["Celsius (°C)", "Kelvin (K)", "Fahrenheit
     },
     function(i) {
         if (isNaN(parseFloat(i))) {
+            return "";
+        }
+        if (parseFloat(i) < 0) {
             return "";
         }
         i = new Decimal(i);
