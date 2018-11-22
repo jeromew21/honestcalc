@@ -11,11 +11,15 @@ Finally, a good looking, intuitive calculator to help with your homework and aid
 
 ### FAQ
 
-Q: Why no cert?
+**Q: Why no cert?**
 
-A: Because lazy
+A: Because lazy. Will get around to setting that up.
 
 
-Q: Why another one? Aren't there enough of there out there?
+**Q: Why another one of these? Aren't there enough out there already?**
 
-A: Because the other ones are ugly.
+A: Because the other ones are ugly. Also, we want to make money.
+
+**Q: Are you open source?**
+
+A: Yes! [Github](https://github.com/jeromew21/honestcalc)
