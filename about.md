@@ -11,15 +11,22 @@ Finally, a good looking, intuitive calculator to help with your homework and aid
 
 ### FAQ
 
-**Q: Why no cert?**
-
-A: Because lazy. Will get around to setting that up.
-
-
 **Q: Why another one of these? Aren't there enough out there already?**
 
-A: Because the other ones are ugly. Also, we want to make money.
+A: Because the other ones are ugly, clunky, and not as awesome as this one!
 
 **Q: Are you open source?**
 
 A: Yes! [Github](https://github.com/jeromew21/honestcalc)
+
+**Q: Should I donate to you?**
+
+A: Yes!
+
+<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+<input type="hidden" name="cmd" value="_s-xclick" />
+<input type="hidden" name="hosted_button_id" value="XF5WLYT79DUQ6" />
+<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" />
+<img alt="" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1" />
+</form>
+
