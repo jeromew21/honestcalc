@@ -10,6 +10,6 @@ permalink: /contact/
 <form action="https://formspree.io/jeromew@berkeley.edu" method="POST">
     <p>Name: <input type="text" name="fullname" /></p>
     <p>Email: <input type="email" name="email" /></p>
-    <p>Message: <textarea name="email"></textarea></p>
+    <p>Message: <textarea name="message"></textarea></p>
     <button type="submit" class="btn">Submit</button>
 </form>
