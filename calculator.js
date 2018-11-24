@@ -4,6 +4,7 @@ var nibble_table = {'0000': '0', '0001': '1', '0010': '2', '0011': '3', '0100': 
 var hex_table = {'0': '0000', '1': '0001', '2': '0010', '3': '0011', '4': '0100', '5': '0101', '6': '0110', '7': '0111', '8': '1000', '9': '1001', 'A': '1010', 'B': '1011', 'C': '1100', 'D': '1101', 'E': '1110', 'F': '1111'}
 
 var strip_leading_zeroes = function(input) {
+    if (input == undefined) { return "" }
     var result = "";
     var i = 0;
     while (i < input.length) {
@@ -99,6 +100,8 @@ var binary_to_decimal = function(binary) {
     for (var i = binary.length - 1; i >= 0; i--) {
         if (binary.charAt(i) == "1") {
             result += Math.pow(2, n);
+        } else if (binary.charAt(i) != "0") {
+            return "";
         }
         n += 1;
     }
@@ -135,7 +138,11 @@ var decimal_to_twos = function(decimal, bits) {
             }
         }
         var added1 = parseInt(binary_to_decimal(inverted_binary)) + 1;
-        return least_sig(decimal_to_binary_unsigned("" + added1), bits); //cut off eight places
+        var result = decimal_to_binary_unsigned("" + added1), bits;
+        if (result.length > bits) {
+            return least_sig(result, bits);
+        }
+        return "0".repeat(bits - result.length) + result;
     }
 }
 
@@ -235,6 +242,40 @@ var twos = new ConversionComponent(["Hexadecimal", "Binary (Two's Complement)", 
     [function(decimal) { return binary_to_hex(decimal_to_twos(decimal, 8)); }, function(decimal) { return decimal_to_twos(decimal, 8) }],
 ], "8-bit Two's Complement Integer Representation");
 
+var int32 = new ConversionComponent(["Hexadecimal", "Binary (Two's Complement)", "Decimal"], [
+    [function(hex) {
+        if (hex == "") {
+            return ""
+        }
+        var binary_rep = hex_to_binary(hex);
+        if (binary_rep == "") {
+            return ""
+        }
+        if (binary_rep.length > 32) {
+            binary_rep = least_sig(binary_rep, 32);
+        } else {
+            binary_rep = "0".repeat(32 - binary_rep.length) + binary_rep;
+        }
+        return binary_rep; 
+    }, function(hex) {
+        if (hex == "") {
+            return ""
+        }
+        var binary_rep = hex_to_binary(hex);
+        if (binary_rep == "") {
+            return ""
+        }
+        if (binary_rep.length > 32) {
+            binary_rep = least_sig(binary_rep, 32);
+        } else {
+            binary_rep = "0".repeat(32 - binary_rep.length) + binary_rep;
+        }
+        return twos_to_decimal(binary_rep, 32); 
+    }],
+    [binary_to_hex, function(binary) { return twos_to_decimal(binary, 32); }],
+    [function(decimal) { return binary_to_hex(decimal_to_twos(decimal, 32)); }, function(decimal) { return decimal_to_twos(decimal, 32) }],
+], "32-bit Two's Complement Integer Representation (int32)");
+
 class ConversionComponentV2 { //A more elegant Conversion compoment.
     constructor(list_of_types, funcs, title) {
         this.types = list_of_types;
@@ -263,8 +304,6 @@ class ConversionComponentV2 { //A more elegant Conversion compoment.
                     var inputElems = $("." + self.idPrefix);
                     for (var m = 0; m < num_elems-1; m += 1) { //runs one less than length times
                         var convertedValue = funcs[fi%num_elems](lastValue);
-                        console.log("f1", fi);
-                        console.log((fi+1)%num_elems)
                         $("body").find("#" + inputElems[(fi+1)%num_elems].id).val(convertedValue);
                         lastValue = convertedValue;
                         fi += 1;
@@ -411,7 +450,7 @@ class FunctionComponentOptions {
             html += '<div><input type="text" class="' + this.idPrefix + 'text ' + this.idPrefix + '" id="' + elemId + '"> ' + this.labels[i][0] + " ";
             html += "<select class='" + this.idPrefix + " " + this.idPrefix + "sel'>";
             for (var q in this.labels[i][1]) {
-                html += "<option value='" + this.labels[i][1][q] + "'>";
+                html += '<option value="' + this.labels[i][1][q] + '">';
                 html += this.labels[i][1][q]
                 html += "</option>";
             }
@@ -423,7 +462,6 @@ class FunctionComponentOptions {
                     var args = [];
                     var inputElems = $("." + self.idPrefix + 'text');
                     var inputElems2 = $("." + self.idPrefix + "sel");
-                    console.log(inputElems)
                     for (var m = 0; m < inputElems.length; m++) {
                         args.push([inputElems[m].value, inputElems2[m].value])
                     }
@@ -477,14 +515,58 @@ var bmi = new FunctionComponentOptions([
     ["Weight", ["lb", "kg"]],
     ["Height", ["ft'in", "inches", "cm", "m"]],
 ], function(args) {
-    console.log(args)
-    var w = args[0];
-    var h = args[1];
-    var index = (w / (h*h));
-    if (isNaN(parseFloat(index))) {
+    var w = args[0][0];
+    var h = args[1][0];
+    if (isNaN(parseFloat(w))) {
         return "Please enter valid numbers"
     }
-    return "BMI: " + index;
+    w = parseFloat(w);
+    if (args[0][1] == "lb") {
+        w = w/2.205;
+    }
+    console.log(args[1][1])
+    if (args[1][1] == "ft'in") {
+        var ft = parseInt(h.split("'")[0])
+        var inches = h.split("'")[1]
+        if (inches == "" || inches == undefined) {
+            inches = 0;
+        } else { 
+            inches = parseInt(inches)
+        }
+        h = ft*12 + inches
+        args[1][1] = "inches";
+    }
+    if (args[1][1] == "inches") {
+        h = parseFloat(h);
+        h = h/39.37;
+        console.log(h)
+    } else if (args[1][1] == "cm") {
+        h = parseFloat(h);
+        h /= 100;
+    } else if (args[1][1] == "m") {
+        h = parseFloat(h);
+    }
+    if (isNaN(parseFloat(h))) {
+        return "Please enter valid numbers"
+    }
+    var index = (w / (h*h));
+    if (isNaN(index)) {
+        return "Please enter valid numbers"
+    }
+    var result = "BMI: " + index.toPrecision(3);
+    if (index < 19) {
+        result += "<br> According to conventional interpretation, this is underweight"
+    } else if (index < 25) {
+        result += "<br> According to conventional interpretation, this is a healthy weight"
+    } else if (index < 30) {
+        result += "<br> According to conventional interpretation, this is overweight"
+    } else if (index < 40) {
+        result += "<br> According to conventional interpretation, this is obese"
+    } else {
+        result += "<br> According to conventional interpretation, this is extremely obese"
+    }
+    result += "<br>For more information: <a href='https://en.wikipedia.org/wiki/Body_mass_index#Limitations'>https://en.wikipedia.org/wiki/Body_mass_index#Limitations</a>"
+    return result;
 }, "BMI Calculator")
 
 var temp = new ConversionComponentV2(["Celsius (°C)", "Kelvin (K)", "Fahrenheit (°F)"], [
@@ -515,4 +597,173 @@ var temp = new ConversionComponentV2(["Celsius (°C)", "Kelvin (K)", "Fahrenheit
         i = new Decimal(i);
         return i.minus(32).times(9).dividedBy(5);
     },
-], "Temperature");
+], "Temperature*");
+
+var float_to_decimal = function(ft) {
+    var absVal;
+    var width = 32;
+    var expBits = 8;
+    var significandBits = 23;
+    var bias = 127;
+    if (ft == "" || ft.length != width) { return ""; } 
+    var sign = ft.charAt(0);
+    var exp = ft.substring(1, 1+expBits);
+    var significand = ft.substring(1+expBits, width) + "0".repeat(bias);
+    var denorm = false;
+    if (exp == "0".repeat(expBits)) {
+        denorm = true;
+    }
+    exp = binary_to_decimal(exp);
+    if (exp == (bias*2)+1){
+        if (significand.substring(0, significandBits) != "0".repeat(significandBits)) {
+            console.log("NaN case")
+            return "NaN"
+        }
+        absVal = parseFloat("Infinity")
+    } else {
+        exp = exp - bias;
+        if (denorm || exp == 0) {
+            significand = "0" + significand;
+            exp = -1 * (bias-1);
+        } else {
+            significand = "1" + significand;
+        }
+        var intBitstring; 
+        var fracBitstring;
+        if (exp < 0) {
+            intBitstring = "0"
+            fracBitstring = "0".repeat((-1*exp)-1) + significand;
+            //Dont chop for gt precision
+        } else if (exp > 0) {
+            intBitstring = significand.substring(0, 1+exp);
+            fracBitstring = significand.substring(1+exp, significand.length);
+        } else { //exp == 0
+            intBitstring = significand.charAt(0);
+            fracBitstring = significand.substring(1, significand.length);
+        }
+        console.log(intBitstring)
+        console.log(fracBitstring)
+        console.log(exp)
+        var fracValue = 0;
+        var frac = 2;
+        for (var i = 0; i < fracBitstring.length; i++) {
+            if (fracBitstring.charAt(i) == "1") {
+                fracValue += 1/frac;
+            }
+            frac *= 2;
+        }
+        absVal = parseFloat(binary_to_decimal(intBitstring)) + fracValue;
+    }
+    if (sign == "1") {
+        return absVal * -1;
+    }
+    return absVal;
+}
+
+var decimal_to_float = function(dec) {
+    var width = 32;
+    var expBits = 8;
+    var significandBits = 23;
+    var bias = 127;
+    var sign;
+    if (isNaN(parseFloat(dec))) {
+        return ""
+    } else if (dec == "Infinity") {
+        return "0" + "1".repeat(expBits) + "0".repeat(significandBits);
+    } else if (dec == "-Infinity") {
+        return "1" + "1".repeat(expBits) + "0".repeat(significandBits);
+    }
+    var result = "";
+    if (parseFloat(dec) < 0) {
+        sign = "1";
+        dec = dec.substring(1, dec.length); //cut off negative
+    } else if (parseFloat(dec) == 0) {
+        return "0".repeat(32);
+    } else {
+        sign = "0";
+    }
+    var intPart = decimal_to_binary_unsigned(dec.split(".")[0]);
+    if (intPart == "0") {
+        intPart = ""
+    }
+    var fracPart = dec.split(".")[1];
+    if (fracPart == undefined || fracPart == "") {
+        fracPart = "0".repeat(bias);
+    } else {
+        var fp = parseFloat("0." + fracPart);
+        var fracPartBinary = "";
+        for (var i = 0; i < bias; i++) {
+            fp = fp * 2;
+            if (fp > 1) {
+                fp = fp - 1;
+                fracPartBinary += "1";
+            } else if (fp == 1) {
+                fracPartBinary += "1";
+                fracPartBinary += "0".repeat(bias-i);
+                break;
+            } else {
+                fracPartBinary += "0";
+            }
+        }
+        fracPart = fracPartBinary;
+    }
+    var significand; //not trimmed yet
+    var exp;
+    if (intPart > 0) {
+        exp = intPart.length-1;
+        significand = intPart + fracPart;
+        significand = significand.substring(1, significand.length); //lop off implicit 1
+    } else {
+        exp = 0;
+        var k = 0;
+        while (fracPart[k] == 0) {
+            exp -= 1;
+            k += 1;
+        }
+        exp -= 1; //handle denorms heah. A bit broken. TODO: Fix
+        if (exp == -1*bias) {
+            significand = fracPart.substring((-1*exp) - 1, fracPart.length);             
+        } else {
+            significand = fracPart.substring(-1*exp, fracPart.length); 
+        }        
+    }
+    exp += bias;
+    significand += "0".repeat(bias)
+    result += sign + least_sig("0".repeat(expBits) + decimal_to_binary_unsigned("" + exp), expBits)
+    result += significand.substring(0, significandBits);
+    return result;
+}
+
+var float = new ConversionComponent(["Hexadecimal", "Binary (IEEE 754)", "Decimal"], [
+    [function(hex) {
+        if (hex == "") {
+            return ""
+        }
+        var binary_rep = hex_to_binary(hex);
+        if (binary_rep == "") {
+            return ""
+        }
+        if (binary_rep.length > 32) {
+            binary_rep = least_sig(binary_rep, 32);
+        } else {
+            binary_rep = "0".repeat(32 - binary_rep.length) + binary_rep;
+        }
+        return binary_rep; 
+    }, function(hex) {
+        if (hex == "") {
+            return ""
+        }
+        var binary_rep = hex_to_binary(hex);
+        if (binary_rep == "") {
+            return ""
+        }
+        if (binary_rep.length > 32) {
+            binary_rep = least_sig(binary_rep, 32);
+        } else {
+            binary_rep = "0".repeat(32 - binary_rep.length) + binary_rep;
+        }
+        return float_to_decimal(binary_rep); 
+    }],
+    [binary_to_hex, function(binary) { return float_to_decimal(binary); }],
+    [function(decimal) { return binary_to_hex(decimal_to_float(decimal)); }, function(decimal) { return decimal_to_float(decimal) }],
+], "32-bit Float Representation (float)*");

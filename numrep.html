@@ -3,10 +3,28 @@ layout: default
 title: Number Representation
 description: "Convert binary to hex, decimal, unsigned, and two's complement."
 permalink: /numrep/
+banner: <img src="/images/banner-982162_960_720.jpg" />
 ---
 
-<div id="content"></div>
+<div class="row">
+	<div class="col-lg-10">
+		<div id="content"></div>
+	</div>
+	<div class="col-lg-2 ads">
+		Contact if you want to advertise here!
+	</div>
+</div>
+<div id="placeholder">
+		<div class="calc"><h3>Unsigned Integer Representation</h3>
+			<p>Hexadecimal ↔ Binary (unsigned) ↔ Decimal</p><div><input type="text" class="52pcfj1zjdf" id="52pcfj1zjdf0" data-_extension-text-contrast=""> Hexadecimal</div><div><input type="text" class="52pcfj1zjdf" id="52pcfj1zjdf1" data-_extension-text-contrast=""> Binary (unsigned)</div><div><input type="text" class="52pcfj1zjdf" id="52pcfj1zjdf2" data-_extension-text-contrast=""> Decimal</div></div><div class="calc"><h3>8-bit Two's Complement Integer Representation</h3>
+			<p>Hexadecimal ↔ Binary (Two's Complement) ↔ Decimal</p><div><input type="text" class="25gdmbmwsys" id="25gdmbmwsys0" data-_extension-text-contrast=""> Hexadecimal</div><div><input type="text" class="25gdmbmwsys" id="25gdmbmwsys1" data-_extension-text-contrast=""> Binary (Two's Complement)</div><div><input type="text" class="25gdmbmwsys" id="25gdmbmwsys2" data-_extension-text-contrast=""> Decimal</div></div><div class="calc"><h3>32-bit Two's Complement Integer Representation (int32)</h3>
+			<p>Hexadecimal ↔ Binary (Two's Complement) ↔ Decimal</p><div><input type="text" class="70n96crtg1" id="70n96crtg10" data-_extension-text-contrast=""> Hexadecimal</div><div><input type="text" class="70n96crtg1" id="70n96crtg11" data-_extension-text-contrast=""> Binary (Two's Complement)</div><div><input type="text" class="70n96crtg1" id="70n96crtg12" data-_extension-text-contrast=""> Decimal</div></div><div class="calc"><h3>32-bit Float Representation (float)*</h3>
+			<p>Hexadecimal ↔ Binary (IEEE 754) ↔ Decimal</p><div><input type="text" class="792cva1l7ct" id="792cva1l7ct0" data-_extension-text-contrast=""> Hexadecimal</div><div><input type="text" class="792cva1l7ct" id="792cva1l7ct1" data-_extension-text-contrast=""> Binary (IEEE 754)</div><div><input type="text" class="792cva1l7ct" id="792cva1l7ct2" data-_extension-text-contrast=""> Decimal</div></div>
+</div>
+<p>*Susceptible to round-off error.</p>
 <script>
 	usign.mount()
 	twos.mount()
+	int32.mount()
+	float.mount()
 </script>

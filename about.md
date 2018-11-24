@@ -11,9 +11,9 @@ Finally, a good looking, intuitive calculator to help with your homework and aid
 
 ### FAQ
 
-**Q: Why another one of these? Aren't there enough out there already?**
+**Q: What do you bring to the table? There are a lot of similar sites out there.**
 
-A: Because the other ones are ugly, clunky, and not as awesome as this one!
+A: The other ones are ugly, clunky, and not as awesome as this one!
 
 **Q: Are you open source?**
 
